@@ -26,6 +26,36 @@ The root object in a client application is `AxonSynapseApplication`.
 app = axon.AxonSynapseApplication()
 ```
 
+To send commands, events, queries to the server, define an `async` function with one argument in its signature.
+
+```
+async def main(client: axon.AxonSynapseClient):
+    command = IssueCardCommand("DemoCard-001", 75)
+    await client.dispatch(command)
+```
+
+An `AxonSynapseClient` object implements the essential POST requests to commands, events and queries.
+
+```
+# Pseudo code 
+class AxonSynapseClient:
+
+    # Send commands with
+    def dispatch(command): ...
+
+    # Send queries with
+    def query(query): ...
+
+    # Send events with
+    def apply(event): ...
+```
+
+To run the application use the `run()` method and pass your entry point. 
+
+```
+app.run(main)
+```
+
 To register a handler use the decorators `@app.command_handler`, `@app.event_handler`, `@app.query_handler`. 
 
 Example:
