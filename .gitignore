@@ -1,3 +1,7 @@
+SCRATCH
+sandbox.py
+scratch.py
+.archive/
 .vscode/
 # Created by https://www.toptal.com/developers/gitignore/api/python,virtualenv,macos,visualstudiocode,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,virtualenv,macos,visualstudiocode,dotenv
