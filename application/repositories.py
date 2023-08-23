@@ -1,10 +1,9 @@
 from typing import Tuple, Generic, TypeVar
 from abc import ABC, abstractmethod
-from domain.decider import C, S, E
 
-# C = TypeVar("C")
-# S = TypeVar("S")
-# E = TypeVar("E")
+C = TypeVar("C")
+S = TypeVar("S")
+E = TypeVar("E")
 V = TypeVar("V")
 
 
@@ -45,4 +44,8 @@ class ViewStateRepository(ABC, Generic[E, S]):
 
     @abstractmethod
     async def save(self, s: S) -> S:
+        ...
+
+    @abstractmethod
+    async def fetch_all(self) -> list[S]:
         ...

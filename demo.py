@@ -3,7 +3,7 @@ from pprint import pprint
 from aiohttp import web
 import nest_asyncio
 
-from adapter.payload_service import register_payloads, payload_types_from_objects
+from adapter.payload_service import register_payloads, payload_types_from_classes
 from adapter.message_handlers import (
     EventMessageHandler,
     CommandMessageHandler,
@@ -39,7 +39,7 @@ async def run(client: AxonSynapseClient, port=8888):
             web.post(
                 "/events",
                 EventMessageHandler(
-                    MaterializedView[GiftCardSummary | None, GiftCardEvent](
+                    MaterializedView[GiftCardSummary, GiftCardEvent](
                         view=GiftCardSummaryView(),
                         repository=state_repository,
                     ).handle
@@ -69,7 +69,7 @@ async def register_handlers(client: AxonSynapseClient):
 
     response = await client.register_event_handler(
         callback_endpoint=f"{callback_url}/events",
-        names=payload_types_from_objects(
+        names=payload_types_from_classes(
             CardIssuedEvent, CardRedeemedEvent, CardCanceledEvent
         ),
         **kwargs,
@@ -77,7 +77,7 @@ async def register_handlers(client: AxonSynapseClient):
     pprint(response)
     response = await client.register_command_handler(
         callback_endpoint=f"{callback_url}/commands",
-        names=payload_types_from_objects(
+        names=payload_types_from_classes(
             IssueCardCommand, RedeemCardCommand, CancelCardCommand
         ),
         **kwargs,
@@ -85,7 +85,7 @@ async def register_handlers(client: AxonSynapseClient):
     pprint(response)
     response = await client.register_query_handler(
         callback_endpoint=f"{callback_url}/queries",
-        names=payload_types_from_objects(
+        names=payload_types_from_classes(
             CountCardSummariesQuery, FetchCardSummariesQuery
         ),
         **kwargs,

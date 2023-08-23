@@ -1,8 +1,13 @@
 from functools import reduce
-from typing import Generic, Tuple
+from typing import Tuple, TypeVar
 from abc import abstractmethod
-from domain.decider import IDecider, C, S, E
-from .repositories import EventRepository, EventLockingRepository, V
+from domain.decider import IDecider
+from .repositories import EventRepository, EventLockingRepository
+
+C = TypeVar("C")
+S = TypeVar("S")
+E = TypeVar("E")
+V = TypeVar("V")
 
 
 class IEventSourcingAggregate(IDecider[C, S, E], EventRepository[C, E]):

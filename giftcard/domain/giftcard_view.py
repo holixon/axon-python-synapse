@@ -1,5 +1,5 @@
 import dataclasses
-from application.views import MaterializedView, IView
+from domain.view import IView
 from giftcard.payloads import *
 
 
@@ -11,14 +11,14 @@ class GiftCardSummary:
     isActive: bool = True
 
 
-class GiftCardSummaryView(IView[GiftCardSummary | None, GiftCardEvent]):
+class GiftCardSummaryView(IView[GiftCardSummary, GiftCardEvent]):
     @property
     def initial_state(self) -> GiftCardSummary | None:
         return None
 
     def evolve(
         self, state: GiftCardSummary | None, event: GiftCardEvent
-    ) -> GiftCardSummary | None:
+    ) -> GiftCardSummary:
         match event:
             case CardIssuedEvent():
                 return GiftCardSummary(
@@ -43,4 +43,5 @@ class GiftCardSummaryView(IView[GiftCardSummary | None, GiftCardEvent]):
                     )
             case _:
                 print(f"Nothing found for {event}")
-        return None
+
+        raise ValueError(f"Unexpected event {event}")

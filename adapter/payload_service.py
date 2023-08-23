@@ -10,11 +10,19 @@ def register_payloads(payloads):
 
 
 def payload_type_from_object(obj):
-    return _REVPAYLOADS[obj.__class__]
+    return payload_type_from_class(obj.__class__)
+
+
+def payload_type_from_class(cls):
+    return _REVPAYLOADS[cls]
 
 
 def payload_types_from_objects(*objects):
     return [payload_type_from_object(o) for o in objects]
+
+
+def payload_types_from_classes(*classes):
+    return [payload_type_from_class(c) for c in classes]
 
 
 def payload_from_object(obj):
