@@ -1,4 +1,5 @@
 import dataclasses
+from adapter.payload_service import register_payloads
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -53,3 +54,17 @@ class FetchCardSummariesQuery:
 
 
 GiftCardQuery = CountCardSummariesQuery | FetchCardSummariesQuery
+
+
+register_payloads(
+    {
+        "io.axoniq.demo.giftcard.api.IssueCardCommand": IssueCardCommand,
+        "io.axoniq.demo.giftcard.api.RedeemCardCommand": RedeemCardCommand,
+        "io.axoniq.demo.giftcard.api.CancelCardCommand": CancelCardCommand,
+        "io.axoniq.demo.giftcard.api.CardIssuedEvent": CardIssuedEvent,
+        "io.axoniq.demo.giftcard.api.CardRedeemedEvent": CardRedeemedEvent,
+        "io.axoniq.demo.giftcard.api.CardCanceledEvent": CardCanceledEvent,
+        "io.axoniq.demo.giftcard.api.CountCardSummariesQuery": CountCardSummariesQuery,
+        "io.axoniq.demo.giftcard.api.FetchCardSummariesQuery": FetchCardSummariesQuery,
+    }
+)

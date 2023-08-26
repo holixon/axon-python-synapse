@@ -93,20 +93,6 @@ async def register_handlers(client: AxonSynapseClient):
     pprint(response)
 
 
-register_payloads(
-    {
-        "io.axoniq.demo.giftcard.api.IssueCardCommand": IssueCardCommand,
-        "io.axoniq.demo.giftcard.api.RedeemCardCommand": RedeemCardCommand,
-        "io.axoniq.demo.giftcard.api.CancelCardCommand": CancelCardCommand,
-        "io.axoniq.demo.giftcard.api.CardIssuedEvent": CardIssuedEvent,
-        "io.axoniq.demo.giftcard.api.CardRedeemedEvent": CardRedeemedEvent,
-        "io.axoniq.demo.giftcard.api.CardCanceledEvent": CardCanceledEvent,
-        "io.axoniq.demo.giftcard.api.CountCardSummariesQuery": CountCardSummariesQuery,
-        "io.axoniq.demo.giftcard.api.FetchCardSummariesQuery": FetchCardSummariesQuery,
-    }
-)
-
-
 async def main():
     async with AxonSynapseClient() as client:
         await register_handlers(client=client)
