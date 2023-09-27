@@ -114,6 +114,7 @@ class AxonSynapseClient:
             response.raise_for_status()
             if response.content_type == "application/json":
                 result = await response.json()
+                print(f'Got {len(result.get("items"))} events.')
                 items = [EventResponse(**e) for e in result.get("items")]
             else:
                 items = []
@@ -157,6 +158,11 @@ class AxonSynapseClient:
         sequence_number: int = 0,
         context: str = "default",
     ):
+        print(
+            f"APPEND EVENT {aggregate_id}, {aggregate_type}, {payload_type}, {sequence_number}"
+        )
+        print(f"{payload}")
+
         async with self.session.post(
             url=f"{self.api_url}/contexts/{context}/events/{payload_type}",
             json=payload,
@@ -222,6 +228,17 @@ class AxonSynapseClient:
         )
         return RegisterCommandHandlerReponse(**result)
 
+    async def unregister_event_handler(
+        self,
+        handler_id: str,
+        context: str = "default",
+    ):
+        async with self.session.delete(
+            url=f"{self.api_url}/contexts/{context}/handlers/events/{handler_id}"
+        ) as response:
+            response.raise_for_status()
+            return response.status == 204
+
     async def register_event_handler(
         self,
         handler_id: str,
@@ -229,18 +246,38 @@ class AxonSynapseClient:
         component_name: str,
         names: list[str],
         callback_endpoint: str,
+        batch_size: int = 1,
+        start: int = 0,
+        enabled: bool = True,
         context: str = "default",
     ):
-        result = await self.register_handler(
-            handler_type="events",
-            handler_id=handler_id,
-            client_id=client_id,
-            component_name=component_name,
-            names=names,
-            callback_endpoint=callback_endpoint,
-            context=context,
-        )
-        return RegisterEventHandlerReponse(**result)
+        async with self.session.put(
+            url=f"{self.api_url}/contexts/{context}/handlers/events/{handler_id}",
+            json={
+                "names": names,
+                "endpoint": callback_endpoint,
+                "endpointType": "http-raw",
+                "clientId": client_id,
+                "componentName": component_name,
+                "batchSize": batch_size,
+                "start": start,
+                "enabled": enabled,
+            },
+        ) as response:
+            response.raise_for_status()
+            result = await response.json()
+            pprint(result)
+            return RegisterEventHandlerReponse(**result)
+
+        # result = await self.register_handler(
+        #     handler_type="events",
+        #     handler_id=handler_id,
+        #     client_id=client_id,
+        #     component_name=component_name,
+        #     names=names,
+        #     callback_endpoint=callback_endpoint,
+        #     context=context,
+        # )
 
     async def register_query_handler(
         self,
@@ -278,7 +315,7 @@ class AxonSynapseClient:
             json={
                 "names": names,
                 "endpoint": callback_endpoint,
-                "endpoint_type": "http-raw",
+                "endpointType": "http-raw",
                 "clientId": client_id,
                 "componentName": component_name,
             },
@@ -287,6 +324,26 @@ class AxonSynapseClient:
             result = await response.json()
             pprint(result)
             return result
+
+    async def get_event_handlers(self, context: str = "default"):
+        async with self.session.get(
+            url=f"{self.api_url}/contexts/{context}/handlers/events"
+        ) as response:
+            response.raise_for_status()
+            data = await response.json()
+            pprint(data)
+            return [RegisterEventHandlerReponse(**e) for e in data["items"]]
+
+    async def get_event_handler(self, handler_id: str, context: str = "default"):
+        async with self.session.get(
+            url=f"{self.api_url}/contexts/{context}/handlers/events/{handler_id}"
+        ) as response:
+            if response.status == 404:
+                return None
+            response.raise_for_status()
+            data = await response.json()
+            pprint(data)
+            return RegisterEventHandlerReponse(**data)
 
 
 async def test_query(client: AxonSynapseClient):

@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from domain.view import IView, S, E
+from axon.domain.view import IView, S, E
 from .repositories import ViewStateRepository
 
 
@@ -25,6 +25,9 @@ class MaterializedView(IMaterializedView[S, E]):
 
     def evolve(self, s: S | None, e: E) -> S:
         return self.view.evolve(s, e)
+
+    async def __call__(self, event: E, _) -> S:
+        return await self.handle(event)
 
     async def handle(self, event: E) -> S:
         current_state = await self.repository.fetch_state(event)

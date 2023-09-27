@@ -1,3 +1,0 @@
-nest_asyncio
-aiohttp
-aiohttp_jinja2
