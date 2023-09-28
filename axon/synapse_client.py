@@ -1,3 +1,4 @@
+import os
 import dataclasses
 from typing import Any, Optional
 from pprint import pprint
@@ -92,8 +93,11 @@ class RegisterQueryHandlerReponse:
 
 
 class AxonSynapseClient:
-    def __init__(self, api_url: str = "http://localhost:8080/v1") -> None:
-        self.api_url = api_url
+    def __init__(self, api_url: str | None = None) -> None:
+        self.api_url = api_url or os.getenv(
+            "AXON_SYNAPSE_API", "http://localhost:8080/v1"
+        )
+        print(f"API enpoint: {self.api_url}")
         self.session = ClientSession()
 
     async def __aenter__(self):
@@ -114,7 +118,7 @@ class AxonSynapseClient:
             response.raise_for_status()
             if response.content_type == "application/json":
                 result = await response.json()
-                print(f'Got {len(result.get("items"))} events.')
+                # print(f'Got {len(result.get("items"))} events.')
                 items = [EventResponse(**e) for e in result.get("items")]
             else:
                 items = []
@@ -158,10 +162,10 @@ class AxonSynapseClient:
         sequence_number: int = 0,
         context: str = "default",
     ):
-        print(
-            f"APPEND EVENT {aggregate_id}, {aggregate_type}, {payload_type}, {sequence_number}"
-        )
-        print(f"{payload}")
+        # print(
+        #     f"APPEND EVENT {aggregate_id}, {aggregate_type}, {payload_type}, {sequence_number}"
+        # )
+        # print(f"{payload}")
 
         async with self.session.post(
             url=f"{self.api_url}/contexts/{context}/events/{payload_type}",

@@ -10,5 +10,5 @@ setup(
     author_email="ferhat.ayaz@holisticon.de",
     url="https://www.holisticon.de",
     packages=["axon", "axon.adapter", "axon.application", "axon.domain"],
-    install_requires=["aiohttp"],
+    install_requires=["aiohttp", "termcolor"],
 )

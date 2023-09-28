@@ -59,14 +59,14 @@ def message_handler(
                 for f in dataclasses.fields(mtype)
             }
             message = mtype(**kwargs)
-            print(
-                colored("MESSAGE", "green"),
-                colored(str(message), "light_green"),
-            )
+            # print(
+            #     colored("MESSAGE", "green"),
+            #     colored(str(message), "light_green"),
+            # )
             payload = await request.json()
-            print(colored("PAYLOAD", "yellow"), payload)
+            # print(colored("PAYLOAD", "yellow"), payload)
             obj = object_from_payload(message.payloadType, payload)
-            print("OBJECT", obj)
+            # print("OBJECT", obj)
             result = await handler(obj, message)
             # print(colored("RESULT", "light_blue"), result)
             return web.json_response(result, dumps=dumps)
