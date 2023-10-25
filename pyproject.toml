@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools", "wheel"]      # PEP 508 specifications.
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "axon-synapse"
+version = "0.0.1"
+requires-python = ">=3.10"
+description = "Axon Synapse Python Library"
+dependencies = ["aiohttp", "termcolor"]
+authors = [{ name = "Ferhat Ayaz", email = "ferhat.ayaz@holisticon.de" }]
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://www.holisticon.de"
+# Documentation = "https://readthedocs.org"
+# Repository = "https://github.com/me/spam.git"
+# Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
