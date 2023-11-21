@@ -6,7 +6,7 @@ from pprint import pprint
 from aiohttp import web
 from aiohttp.typedefs import Handler
 from termcolor import colored, cprint
-from axon.adapter.payloads import object_from_payload, dumps
+from axon.adapter.payloads import payloadclass, dumps
 
 
 @dataclasses.dataclass
@@ -65,7 +65,7 @@ def message_handler(
             # )
             payload = await request.json()
             # print(colored("PAYLOAD", "yellow"), payload)
-            obj = object_from_payload(message.payloadType, payload)
+            obj = payloadclass.to_instance(message.payloadType, payload)
             # print("OBJECT", obj)
             result = await handler(obj, message)
             # print(colored("RESULT", "light_blue"), result)
