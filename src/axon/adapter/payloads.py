@@ -19,9 +19,6 @@ def payloadclass(payload_type: str) -> Callable[[type[T]], type[Any]]:
     def wrapper(cls: type[Any]) -> type[Any]:
         if not is_dataclass(cls):
             raise TypeError(f"{cls.__qualname__} is not a dataclass")
-        # fqcn = f"{cls.__module__}.{cls.__qualname__}"
-        # print(f"CLASS: {fqcn}")
-        # cls._payload_type = payload_type
         _PAYLOADS[payload_type] = cls
         _PAYLOAD_TYPES[cls] = payload_type
         return cls
