@@ -1,0 +1,38 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: PUT
+    uri: http://localhost:8080/v1/contexts/default/handlers/queries/123456
+  response:
+    body:
+      string: '{"id":"123456","names":["axon.test.event"],"endpoint":"http://myhost:888/command","endpointType":"http-raw","endpointOptions":[],"clientId":"pytest-command-handler","componentName":"Test","enabled":true,"context":"default","clientAuthenticationId":null,"serverAuthenticationId":null,"lastError":null}'
+    headers:
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Content-Length:
+      - '300'
+      Content-Type:
+      - application/json
+      Expires:
+      - '0'
+      Location:
+      - http://localhost:8080/v1/contexts/default/handlers/queries/123456/123456
+      Pragma:
+      - no-cache
+      Referrer-Policy:
+      - no-referrer
+      Vary:
+      - Origin
+      - Access-Control-Request-Method
+      - Access-Control-Request-Headers
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      X-XSS-Protection:
+      - 1 ; mode=block
+    status:
+      code: 201
+      message: Created
+version: 1

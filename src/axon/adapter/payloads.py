@@ -11,17 +11,26 @@ class Payload(Protocol):
     _payload_type: ClassVar[str]
 
 
-_PAYLOADS: dict[str, type[Payload]] = {}
+_PAYLOADS: dict[str, type[object]] = {}
+_PAYLOAD_TYPES: dict[type[object], str] = {}
 
 
 def payloadclass(payload_type: str) -> Callable[[type[T]], type[Any]]:
     def wrapper(cls: type[Any]) -> type[Any]:
-        # dcls = dataclass(kw_only=True, frozen=True)(cls)
-        cls._payload_type = payload_type
+        if not is_dataclass(cls):
+            raise TypeError(f"{cls.__qualname__} is not a dataclass")
+        # fqcn = f"{cls.__module__}.{cls.__qualname__}"
+        # print(f"CLASS: {fqcn}")
+        # cls._payload_type = payload_type
         _PAYLOADS[payload_type] = cls
+        _PAYLOAD_TYPES[cls] = payload_type
         return cls
 
     return wrapper
+
+
+def payload_type_for_class(cls):
+    return _PAYLOAD_TYPES[cls]
 
 
 def object_from_payload(payload_type: str, payload: dict[str, Any]) -> Any:

@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]      # PEP 508 specifications.
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "axon-synapse"
+name = "axon-python-synapse"
 version = "0.0.1"
 requires-python = ">=3.10"
 description = "Axon Synapse Python Library"
@@ -15,6 +15,14 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+
+[project.optional-dependencies]
+dev = ['mypy']
+tests = ['pytest', 'pytest-asyncio', 'pytest-recording']
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = ["--import-mode=importlib"]
 
 [project.urls]
 Homepage = "https://www.holisticon.de"

@@ -1,95 +1,9 @@
 import os
-import dataclasses
-from typing import Any, Optional
 from pprint import pprint
-import asyncio
 from aiohttp import ClientSession
-
-
-JSONType = str | int | float | bool | None | dict[str, Any] | list[Any]
-
-
-@dataclasses.dataclass
-class AxonRequestError(Exception):
-    path: str
-    code: str
-    error: str
-    requestId: str
-    timestamp: str
-    status: int
-
-
-@dataclasses.dataclass
-class EventResponse:
-    aggregateId: str
-    aggregateType: str
-    dateTime: str
-    id: str
-    metaData: dict[str, str]
-    name: str
-    payload: JSONType
-    payloadType: str
-    sequenceNumber: int
-    index: int | None = None
-    payloadRevision: int | None = None
-
-
-@dataclasses.dataclass
-class FetchAggregateEventsResponse:
-    items: list[EventResponse]
-
-
-@dataclasses.dataclass
-class RegisterCommandHandlerReponse:
-    names: list[str]
-    endpoint: str
-    endpointType: str
-    endpointOptions: list[dict[str, str]]
-    clientId: str
-    componentName: str
-    loadFactor: int
-    concurrency: int
-    enabled: bool
-    context: str
-    clientAuthenticationId: str
-    serverAuthenticationId: str
-    lastError: str
-    id: str
-
-
-@dataclasses.dataclass
-class RegisterEventHandlerReponse:
-    batchSize: int
-    names: list[str]
-    endpoint: str
-    endpointType: str
-    endpointOptions: list[dict[str, str]]
-    clientId: str
-    componentName: str
-    synapseInstanceId: str | None
-    start: int
-    context: str
-    enabled: bool
-    clientAuthenticationId: str
-    serverAuthenticationId: str
-    lastError: str
-    id: str
-
-
-@dataclasses.dataclass
-class RegisterQueryHandlerReponse:
-    names: list[str]
-    endpoint: str
-    endpointType: str
-    endpointOptions: list[dict[str, str]]
-    clientId: str
-    componentName: str
-    context: str
-    enabled: bool
-    clientAuthenticationId: str
-    serverAuthenticationId: str
-    lastError: str
-    id: str
+from . import JSONType
+from .errors import AxonRequestError
+from .responses import *
 
 
 class AxonSynapseClient:
@@ -220,7 +134,7 @@ class AxonSynapseClient:
         names: list[str],
         callback_endpoint: str,
         context: str = "default",
-    ):
+    ) -> RegisterCommandHandlerReponse:
         result = await self.register_handler(
             handler_type="commands",
             handler_id=handler_id,
@@ -254,7 +168,7 @@ class AxonSynapseClient:
         start: int = 0,
         enabled: bool = True,
         context: str = "default",
-    ):
+    ) -> RegisterEventHandlerReponse:
         async with self.session.put(
             url=f"{self.api_url}/contexts/{context}/handlers/events/{handler_id}",
             json={
@@ -348,100 +262,3 @@ class AxonSynapseClient:
             data = await response.json()
             pprint(data)
             return RegisterEventHandlerReponse(**data)
-
-
-async def test_query(client: AxonSynapseClient):
-    summaries = await client.publish_query(
-        "io.axoniq.demo.giftcard.api.FetchCardSummariesQuery",
-        {
-            "limit": 10,
-            #  "offset": 0,
-        },
-        payload_type="io.axoniq.demo.giftcard.api.FetchCardSummariesQuery",
-    )
-    pprint(summaries)
-
-
-async def test_card(client, card_id):
-    await client.dispatch_command(
-        "io.axoniq.demo.giftcard.api.IssueCardCommand",
-        {"id": card_id, "amount": 100},
-    )
-
-    await client.dispatch_command(
-        "io.axoniq.demo.giftcard.api.RedeemCardCommand",
-        {"id": card_id, "amount": 11},
-    )
-    # await client.dispatch_command(
-    #     "io.axoniq.demo.giftcard.api.RedeemCardCommand",
-    #     {"id": card_id, "amount": 17},
-    # )
-
-    # await client.dispatch_command(
-    #     "io.axoniq.demo.giftcard.api.RedeemCardCommand",
-    #     {"id": card_id, "amount": 36},
-    # )
-
-    # await client.dispatch_command(
-    #     "io.axoniq.demo.giftcard.api.RedeemCardCommand",
-    #     {"id": card_id, "amount": 6},
-    # )
-    events = await client.fetch_aggregate_events(card_id)
-    pprint(events)
-
-
-import uuid
-
-
-async def main():
-    async with AxonSynapseClient() as client:
-        for _ in range(10):
-            await test_card(client, card_id=f"axon-demo-{uuid.uuid4()}")
-        await test_query(client)
-
-        # result = await client.append_event(
-        #     aggregate_id="abc-via-event2",
-        #     aggregate_type="GiftCard",
-        #     payload={
-        #         "id": "abc-via-event2",
-        #     },
-        #     payload_type="io.axoniq.demo.giftcard.api.CardIssuedEvent",
-        #     sequence_number=5,
-        # )
-        # pprint(result)
-
-        # result = await client.publish_query(
-        #     query_name="io.axoniq.demo.giftcard.api.FetchCardSummariesQuery",
-        #     payload={
-        #         # "offset": 0,
-        #         "limit": 10,
-        #         # "id": "hello-py-1",
-        #     },
-        #     response_cardinality="multiple",
-        #     payload_type="io.axoniq.demo.giftcard.api.FetchCardSummariesQuery",
-        #     response_type="io.axoniq.demo.giftcard.api.CardSummary",
-        # )
-        # pprint(result)
-
-        # result = await client.register_handler(
-        #     handler_id="abc",
-        #     handler_type="commands",
-        #     names=["my.demo.command"],
-        #     callback_endpoint="http://localhost:8088/commands",
-        #     client_id="python-demo-7c78946494-p86ts",
-        #     component_name="Demo",
-        # )
-        # pprint(result)
-
-        # result = await client.register_command_handler(
-        #     handler_id="abc",
-        #     client_id="python-demo-7c78946494-p86ts",
-        #     component_name="Demo",
-        #     names=["my.demo.command"],
-        #     callback_endpoint="http://localhost:8088/commands",
-        # )
-        # pprint(result)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
