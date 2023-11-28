@@ -7,7 +7,7 @@ name = "axon-python-synapse"
 version = "0.0.1"
 requires-python = ">=3.10"
 description = "Axon Synapse Python Library"
-dependencies = ["aiohttp", "termcolor"]
+dependencies = ["aiohttp", "termcolor", "pyyaml"]
 authors = [{ name = "Ferhat Ayaz", email = "ferhat.ayaz@holisticon.de" }]
 readme = "README.md"
 classifiers = [
@@ -19,6 +19,9 @@ classifiers = [
 [project.optional-dependencies]
 dev = ['mypy']
 tests = ['pytest', 'pytest-asyncio', 'pytest-recording']
+
+[tool.setuptools.package-data]
+axon = ['*.yaml']
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
