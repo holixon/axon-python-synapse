@@ -1,9 +1,12 @@
 import os
-from pprint import pprint
+import logging
+from pprint import pprint, pformat
 from aiohttp import ClientSession
 from . import JSONType
 from .errors import AxonRequestError
 from .responses import *
+
+logger = logging.getLogger(__name__)
 
 
 class AxonSynapseClient:
@@ -11,7 +14,7 @@ class AxonSynapseClient:
         self.api_url = api_url or os.getenv(
             "AXON_SYNAPSE_API", "http://localhost:8080/v1"
         )
-        print(f"API enpoint: {self.api_url}")
+        logger.info(f"API enpoint: {self.api_url}")
         self.session = ClientSession()
 
     async def __aenter__(self):
@@ -32,7 +35,7 @@ class AxonSynapseClient:
             response.raise_for_status()
             if response.content_type == "application/json":
                 result = await response.json()
-                # print(f'Got {len(result.get("items"))} events.')
+                logger.debug(f'Got {len(result.get("items"))} events.')
                 items = [EventResponse(**e) for e in result.get("items")]
             else:
                 items = []
@@ -48,7 +51,7 @@ class AxonSynapseClient:
         routing_key: str | None = None,
         context: str | None = "default",
     ) -> str:
-        print(command_name, payload)
+        logger.debug(f"{command_name}, {payload}")
         async with self.session.post(
             url=f"{self.api_url}/contexts/{context}/commands/{command_name}",
             json=payload,
@@ -184,18 +187,9 @@ class AxonSynapseClient:
         ) as response:
             response.raise_for_status()
             result = await response.json()
-            pprint(result)
+            # pprint(result)
+            logger.debug(pformat(result))
             return RegisterEventHandlerReponse(**result)
-
-        # result = await self.register_handler(
-        #     handler_type="events",
-        #     handler_id=handler_id,
-        #     client_id=client_id,
-        #     component_name=component_name,
-        #     names=names,
-        #     callback_endpoint=callback_endpoint,
-        #     context=context,
-        # )
 
     async def register_query_handler(
         self,
@@ -215,7 +209,8 @@ class AxonSynapseClient:
             callback_endpoint=callback_endpoint,
             context=context,
         )
-        pprint(result)
+        # pprint(result)
+        logger.debug(pformat(result))
         return RegisterQueryHandlerReponse(**result)
 
     async def register_handler(
@@ -240,7 +235,7 @@ class AxonSynapseClient:
         ) as response:
             response.raise_for_status()
             result = await response.json()
-            pprint(result)
+            logger.debug(pformat(result))
             return result
 
     async def get_event_handlers(self, context: str = "default"):
@@ -249,7 +244,7 @@ class AxonSynapseClient:
         ) as response:
             response.raise_for_status()
             data = await response.json()
-            pprint(data)
+            logger.debug(pformat(data))
             return [RegisterEventHandlerReponse(**e) for e in data["items"]]
 
     async def get_event_handler(self, handler_id: str, context: str = "default"):
@@ -260,5 +255,5 @@ class AxonSynapseClient:
                 return None
             response.raise_for_status()
             data = await response.json()
-            pprint(data)
+            logger.debug(pformat(data))
             return RegisterEventHandlerReponse(**data)
