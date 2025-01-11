@@ -12,14 +12,12 @@ V = TypeVar("V")
 
 class IEventSourcingAggregate(Generic[C, E]):
     @abstractmethod
-    async def handle(self, command: C) -> list[E]:
-        ...
+    async def handle(self, command: C) -> list[E]: ...
 
 
 class IEventSourcingLockingAggregate(Generic[C, E, V]):
     @abstractmethod
-    async def handle(self, command: C) -> list[Tuple[E, V]]:
-        ...
+    async def handle(self, command: C) -> list[Tuple[E, V]]: ...
 
 
 # -----------------------------------------------------------------------------
@@ -72,6 +70,7 @@ class EventSourcingLockingAggregate(
     async def handle(self, command: C) -> list[Tuple[E, V]]:
         # 1. Fetch events for this aggregateID
         current_events_v = await self.repository.fetch_events(command)
+        print(f"GOT current_events_v {current_events_v}")
         current_events = [e[0] for e in current_events_v]
         # 2. Evolve and store the event (result)
         # 3. Use that state and the command to make decisions (new events, new facts)

@@ -52,24 +52,30 @@ def message_handler(
 ) -> AxonHandlerFactory:
     def wrapper(handler: AxonMessageHandler) -> Handler:
         async def handle(request: web.Request) -> web.StreamResponse:
-            if request.content_type != "application/json":
-                return web.Response()
-            kwargs = {
-                f.name: f.type(request.headers.get(f"AxonIQ-{f.name}"))
-                for f in dataclasses.fields(mtype)
-            }
-            message = mtype(**kwargs)
-            # print(
-            #     colored("MESSAGE", "green"),
-            #     colored(str(message), "light_green"),
-            # )
-            payload = await request.json()
-            # print(colored("PAYLOAD", "yellow"), payload)
-            obj = payloadclass.to_instance(message.payloadType, payload)
-            # print("OBJECT", obj)
-            result = await handler(obj, message)
-            # print(colored("RESULT", "light_blue"), result)
-            return web.json_response(result, dumps=dumps)
+            try:
+                print(f"Got request {request}")
+                if request.content_type != "application/json":
+                    return web.Response()
+                kwargs = {
+                    f.name: f.type(request.headers.get(f"AxonIQ-{f.name}"))
+                    for f in dataclasses.fields(mtype)
+                }
+                print(f"Got kwargs {kwargs}")
+                message = mtype(**kwargs)
+                print(
+                    colored("MESSAGE", "green"),
+                    colored(str(message), "light_green"),
+                )
+                payload = await request.json()
+                print(colored("PAYLOAD", "yellow"), payload)
+                obj = payloadclass.to_instance(message.payloadType, payload)
+                print("OBJECT", obj)
+                result = await handler(obj, message)
+                print(colored("RESULT", "light_blue"), result)
+                return web.json_response(result, dumps=dumps)
+            except Exception as e:
+                print(e)
+                raise
 
         return handle
 

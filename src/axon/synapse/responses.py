@@ -43,6 +43,7 @@ class RegisterCommandHandlerReponse:
     concurrency: int
     enabled: bool
     context: str
+    maxConcurrency: int
     clientAuthenticationId: str | None = None
     serverAuthenticationId: str | None = None
     lastError: str | None = None
